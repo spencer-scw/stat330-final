@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Building design and energy efficiency</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="final_project_template_files/libs/clipboard/clipboard.min.js"></script>
+<script src="final_project_template_files/libs/quarto-html/quarto.js"></script>
+<script src="final_project_template_files/libs/quarto-html/popper.min.js"></script>
+<script src="final_project_template_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="final_project_template_files/libs/quarto-html/anchor.min.js"></script>
+<link href="final_project_template_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="final_project_template_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="final_project_template_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="final_project_template_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="final_project_template_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Building design and energy efficiency</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Andrew Pochman, Spencer Wilson, Walter Vogelmann, Zach Perry </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<style type="text/css">
+h1.title {
+font-size: 40px;
+text-align: center;
+}
+h4.author {
+font-size: 40px;
+text-align: center;
+}
+</style>
+<div style="page-break-after: always;"></div>
+<section id="abstract" class="level1">
+<h1>Abstract</h1>
+<p>Here, you will briefly summarize the entire report, including the data used, questions of interest, and relevant findings.</p>
+</section>
+<section id="problem-and-motivation" class="level1">
+<h1>1 Problem and Motivation</h1>
+<p>In this section, you will describe the background information about the study that is necessary to understand why the data are important. In other words, why was it important to gather the data in the first place?</p>
+<section id="data-description" class="level2">
+<h2 class="anchored" data-anchor-id="data-description">1.1 Data Description</h2>
+<div class="cell">
+<pre class="text cell-code"><code>Briefly state the source of your data and describe the relevant variables that **you will use** in your project.  Include important details such as units for the different variables, and what the ``observational units" (rows in the data set) represent (e.g., individuals, countries, etc.)</code></pre>
+</div>
+<p>This data was originally sampled from architectural simulation software (Ecotect) that simulates many things about architectural designs, including their energy efficiency and heating/cooling requirements. Each observation represents a different design for a building and its simulated heating and cooling load. Below is a table describing the different variables collected:</p>
+<table class="table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Feature</th>
+<th style="text-align: right;">Range</th>
+<th style="text-align: right;">Unit</th>
+<th style="text-align: right;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">RelativeCompactness</td>
+<td style="text-align: right;">0.68–0.98</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">The volume to surface ratio is compared the most compact shape with same volume</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">SurfaceArea</td>
+<td style="text-align: right;">514–808</td>
+<td style="text-align: right;">m2</td>
+<td style="text-align: right;">The total area occupied by the building</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">WallArea</td>
+<td style="text-align: right;">245–416</td>
+<td style="text-align: right;">m2</td>
+<td style="text-align: right;">Total area of an exterior building wall including all openings</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">RoofArea</td>
+<td style="text-align: right;">110–220</td>
+<td style="text-align: right;">m2</td>
+<td style="text-align: right;">the surface of the roof of the building</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">OverallHeight</td>
+<td style="text-align: right;">3.5–7</td>
+<td style="text-align: right;">m</td>
+<td style="text-align: right;">Overall height from the lowest point of conditioned space to the highest point</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">Orientation</td>
+<td style="text-align: right;">2–5</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">Orientation decides which direction the building faces</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">GlazingArea</td>
+<td style="text-align: right;">0–0.4</td>
+<td style="text-align: right;">m2</td>
+<td style="text-align: right;">The total area occupied by windows in a building</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">GlazingAreaDistribution</td>
+<td style="text-align: right;">0–5</td>
+<td style="text-align: right;">- The direction of the glazing area covered in the building</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">Output</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">HeatingLoad</td>
+<td style="text-align: right;">6–43</td>
+<td style="text-align: right;">KWh/m2</td>
+<td style="text-align: right;">Amount of heat added in an area to maintain the temperature within acceptable range</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">CoolingLoad</td>
+<td style="text-align: right;">10–48</td>
+<td style="text-align: right;">KWh/m2</td>
+<td style="text-align: right;">The amount of latent and sensible heat removed from the required area to maintain the acceptable temperature</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="questions-of-interest" class="level2">
+<h2 class="anchored" data-anchor-id="questions-of-interest">1.2 Questions of Interest</h2>
+<div class="cell">
+<pre class="text cell-code"><code>Briefly and clearly state the two main questions that you will investigate throughout the report.  These questions should be stated in scientific, and not statistical language.  For example, "Is the slope of log of per capita GDP significantly different from zero?" should instead by give as "Does the log of per capita GDP have an effect on the average life expectancy of females in a given country?"</code></pre>
+</div>
+<p>Do architectural factors such as the dimensions of the walls and roof, the size of windows, and overall compactness of a house have an effect on the energy efficiency of keeping it cool?</p>
+<p>Do these same factors have a different effect on the efficiency of warming the house?</p>
+</section>
+<section id="regression-methods" class="level2">
+<h2 class="anchored" data-anchor-id="regression-methods">1.3 Regression Methods</h2>
+<p>For each question of interest listed in Section 2, describe what regression models, techniques, and tools you will use to fully answer it. These should include any plots you will use for exploratory analysis or diagnostic checks, as well as methods of inference you will use.</p>
+</section>
+</section>
+<section id="analyses-results-and-interpretation" class="level1">
+<h1>2 Analyses, Results, and Interpretation</h1>
+<p>Conduct the analysis in a logical fashion, including necessary code (and not any superfluous code) and its output. Give simple interpretations of your findings related to the questions of interest.</p>
+</section>
+<section id="conclusions" class="level1">
+<h1>3 Conclusions</h1>
+<p>Give additional context to you results and interpretations from Section 5 with respect to the data set and its purpose. Describe any potential weaknesses in your analysis, and how they may affect the reliability of the results.</p>
+</section>
+<section id="contributions" class="level1">
+<h1>4 Contributions</h1>
+<p>For each member of the group, write a short paragraph describing their contribution to this project and the report. It is up to you to decide how to divide up the work, so long as everyone is contributing approximately equally.</p>
+<section id="appendix" class="level2">
+<h2 class="anchored" data-anchor-id="appendix">APPENDIX</h2>
+<p>If there are any analyses, such as exploratory plots/summaries or work you did to determine appropriate transformations, or any relevant material that does not belong in one of the sections above, these can go in the Appendix. If you don’t have any material like this, you can remove this section.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
