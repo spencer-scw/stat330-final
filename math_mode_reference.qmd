@@ -1,0 +1,70 @@
+---
+title: "Latex Math Mode Cheat Sheet"
+format: html
+---
+
+Normally, you can put your math text in between two $ signs like so
+
+$$
+<Math~Text~Here>
+$$
+
+You can also put equations in line, this is useful if you are referencing a variable for example:
+
+In linear regression, we estimate $\beta$ coefficients
+
+Enclose what you want the previous statement to affect in curly braces {}
+
+Ex.
+$$
+\widehat{The~text~is~in~the~curly~braces}
+$$
+Underscores _ are for subscripts, the carrot ^ is for superscripts.If you want to put more than just one letter, make sure to enclose it in the curly braces.
+Example:
+
+$$
+Y_i, Y_{i+1}, Y_{i+2} 
+$$
+$$
+X^{\prime}
+$$
+
+Big/Wide hat
+$$
+\widehat{BigHat}
+$$
+Small hat
+$$
+\hat{SmallHat}
+$$
+
+If you don't want your text to be italicized while in math mode:
+$$
+Y_i = \beta_0 + \beta_1*\text{I}(\text{Rank}_i = \text{AssistantProf}) + \epsilon_i
+$$
+
+If you want to put a bar over something:
+
+$$
+\bar{x}
+$$
+Generally, two backslashes makes a new line in LaTeX, but I've had to wrap everything in displaylines{} to get it to work in Quarto:
+
+$$
+\displaylines{\beta_1 = 1 \\ \beta_2  = 3}
+$$
+If you want your symbol to be bold (for example if you are referencing a vector and not a single value)
+
+this one is bold
+$$
+\boldsymbol{\beta}
+$$
+this one is not
+$$
+\beta
+$$
+
+To make bold letters (in the math font) for example the design matrix:
+$$
+\mathbf{X}
+$$
