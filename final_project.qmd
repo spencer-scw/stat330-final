@@ -18,7 +18,32 @@ text-align: center;
 \newpage
 
 ```{r setup, include=FALSE}
-# load all necessary packages here
+library(tidyverse)
+library(ggfortify)
+library(corrplot)
+library(car)
+library(patchwork)
+library(bestglm)
+library(glmnet)
+library(readxl)
+set.seed(12345)
+```
+
+```{r setup, include=FALSE}
+energy <- read_csv("ENB2012_data.csv")
+energy <- as.data.frame(energy)
+
+# change col names
+colnames(energy) <- c("Compact", "SurfaceA", "WallA", "RoofA", "twoStories", "Orient", "GlazingA", "GlazingADist", "Heat", "Cool")
+
+# remove data we are not using
+energy$Orient <- NULL
+energy$GlazingADist <- NULL
+
+
+# change building height to categorical
+energy$twoStories <- ifelse(energy$twoStories == 7, 1, 0)
+energy$twoStories <- as.factor(energy$twoStories)
 ```
 
 # Abstract
@@ -27,11 +52,34 @@ Here, you will briefly summarize the entire report, including the data used, que
 
 # 1 Problem and Motivation
 
+```{text , include=FALSE}
 In this section, you will describe the background information about the study that is necessary to understand why the data are important.  In other words, why was it important to gather the data in the first place?
+```
+
+This study was done to examine the effects of architectural design features on the energy efficiency of building design. Heating and cooling contribute to a significant portion of energy usage in many buildings around the world. By using sound architectural principles, we can reduce energy consts and carbon emmissions. These data can help us to understand what design features are most connected with reduced energy usage. It's important to focus conservation efforts on the vectors that matter most.
+
+In the study, they simulated the effects of several different factors that might affect the energy usage in cooling or heating a building. In addition, they reported slightly different effects of these factors on the heating cost and cooling cost individually.
+
+The following graph illustrates this idea. It compares the energy usage for heating and cooling:
+
+```{r, fig.align='center'}
+ggplot(data = energy) +
+  geom_point(aes(x = Heat, y = Cool, color = twoStories)) +
+  scale_color_discrete(labels = c("1 Story", "2 Stories")) +
+  labs(
+    title = "Energy usage of heating and cooling is correlated yet not equal",
+    color = "Number of stories",
+    x = "Energy usage in cooling (KWh/m2)",
+    y = "Energy usage in heating (KWh/m2)"
+    )
+  
+```
+
+We'll compare and contrast the effects of different factors on heating and cooling later, but it's interesting to note visually the relationship between heating costs and cooling costs. Rarely will a building be very efficient at heating but not at cooling or vice-versa. You can also see the effect of the number of stories a house has; many of the two story houses needed more energy for both heating and cooling.
 
 ## 1.1 Data Description
 
-```{text}
+```{text , include=FALSE}
 Briefly state the source of your data and describe the relevant variables that **you will use** in your project.  Include important details such as units for the different variables, and what the ``observational units" (rows in the data set) represent (e.g., individuals, countries, etc.)
 ```
 
@@ -40,19 +88,18 @@ This data was originally sampled from architectural simulation software (Ecotect
 | Feature |	 Range |	Unit |	Description |
 |-:|-:|-:|-:|
 | RelativeCompactness | 0.68–0.98 |	- |	The volume to surface ratio compared to the most compact shape with same volume |
-| SurfaceArea |	514–808 |	m2 |	The total area occupied by the floor plan of the building |
-| WallArea |	245–416 |	m2 |	Total area of the exterior building wall including all openings |
-| RoofArea |	110–220 |	m2 |	the surface area of the roof |
+| SurfaceArea |	514–808 |	$m^2$ |	The total area occupied by the floor plan of the building |
+| WallArea |	245–416 |	$m^2$ |	Total area of the exterior building wall including all openings |
+| RoofArea |	110–220 |	$m^2$ |	the surface area of the roof |
 | OverallHeight |	3.5–7 |	m |	Height from the lowest point of conditioned space to the highest point |
-| Orientation |	2–5 |	- |	Direction the building faces |
-| GlazingArea |	0–0.4 |	m2 |	The total area of the walls occupied by windows |
+| GlazingArea |	0–0.4 |	$m^2$ |	The total area of the walls occupied by windows |
 | Output |
-| HeatingLoad  | 6–43 |	KWh/m2 |	Amount of heat added per square meter to maintain comfortable temperature |
-| CoolingLoad |	10–48 |	KWh/m2 |	The amount of heat removed per square meter to maintain comfortable temperature |
+| HeatingLoad  | 6–43 |	KWh/$m^2$ |	Amount of heat added per square meter to maintain comfortable temperature |
+| CoolingLoad |	10–48 |	KWh/$m^2$ |	The amount of heat removed per square meter to maintain comfortable temperature |
 
 ## 1.2 Questions of Interest
 
-```{text}
+```{text , include=FALSE}
 Briefly and clearly state the two main questions that you will investigate throughout the report.  These questions should be stated in scientific, and not statistical language.  For example, "Is the slope of log of per capita GDP significantly different from zero?" should instead by give as "Does the log of per capita GDP have an effect on the average life expectancy of females in a given country?"
 ```
 
@@ -62,22 +109,35 @@ Do these same factors have a different effect on the efficiency of warming the h
 
 ## 1.3 Regression Methods
 
+```{text, include=FALSE}
 For each question of interest listed in Section 2, describe what regression models, techniques, and tools you will use to fully answer it.  These should include any plots you will use for exploratory analysis or diagnostic checks, as well as methods of inference you will use. 
+```
+
+```{r, fig.align='center'}
+
+```
 
 # 2 Analyses, Results, and Interpretation
 
+```{text, include=FALSE}
 Conduct the analysis in a logical fashion, including necessary code (and not any superfluous code) and its output.  Give simple interpretations of your findings related to the questions of interest.
+```
 
 # 3 Conclusions
 
+```{text, include=FALSE}
 Give additional context to you results and interpretations from Section 5 with respect to the data set and its purpose.  Describe any potential weaknesses in your analysis, and how they may affect the reliability of the results.
+```
 
 # 4 Contributions
 
-For each member of the group, write a short paragraph describing their contribution to this project and the report.  It is up to you to decide how to divide up the work, so long as everyone is contributing approximately equally. 
+```{text, include=FALSE}
+For each member of the group, write a short paragraph describing their contribution to this project and the report.  It is up to you to decide how to divide up the work, so long as everyone is contributing approximately equally.
+```
 
 ## APPENDIX
 
+```{text, include=FALSE}
 If there are any analyses, such as exploratory plots/summaries or work you did to determine appropriate transformations, or any relevant material that does not belong in one of the sections above, these can go in the Appendix.  If you don't have any material like this, you can remove this section.
-
+```
 
