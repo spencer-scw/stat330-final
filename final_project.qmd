@@ -56,7 +56,7 @@ Here, you will briefly summarize the entire report, including the data used, que
 In this section, you will describe the background information about the study that is necessary to understand why the data are important.  In other words, why was it important to gather the data in the first place?
 ```
 
-This study was done to examine the effects of architectural design features on the energy efficiency of building design. Heating and cooling contribute to a significant portion of energy usage in many buildings around the world. By using sound architectural principles, we can reduce energy consts and carbon emmissions. These data can help us to understand what design features are most connected with reduced energy usage. It's important to focus conservation efforts on the vectors that matter most.
+This study was done to examine the effects of architectural design features on the energy efficiency of building design. Heating and cooling contribute to a significant portion of energy usage in many buildings around the world. By using sound architectural principles, we can reduce energy consts and carbon emissions. These data can help us to understand what design features are most connected with reduced energy usage. It's important to focus conservation efforts on the vectors that matter most.
 
 In the study, they simulated the effects of several different factors that might affect the energy usage in cooling or heating a building. In addition, they reported slightly different effects of these factors on the heating cost and cooling cost individually.
 
