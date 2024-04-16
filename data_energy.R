@@ -327,11 +327,6 @@ ggplot(data = heat)+
                           color = twoStories))
 
 
-
-
-
-
-
 cool_reduced_log_model <- lm(Cool ~ sqrt(WallA) + twoStories + sqrt(GlazingA) + twoStories*WallA, data = energy)
 cool_reduced <- lm(sqrt(Cool) ~ sqrt(WallA) + twoStories + sqrt(GlazingA), data = energy)
 heat_reduced_log_model <- lm(sqrt(Heat) ~ Compact + sqrt(WallA) + twoStories + sqrt(GlazingA), data = energy)

@@ -113,9 +113,47 @@ Do these same factors have a different effect on the efficiency of warming the h
 For each question of interest listed in Section 2, describe what regression models, techniques, and tools you will use to fully answer it.  These should include any plots you will use for exploratory analysis or diagnostic checks, as well as methods of inference you will use. 
 ```
 
-```{r, fig.align='center'}
+Our route to achieving a good model for the data was a long one. We needed to employ many different strategies to first pick the variables which we included, and then to apply transformations to those variables to meet the conditions for a linear model. Our variable selection code can be found in the appendix.
 
+First in our assumptions is a linear relationship. The core premise of multiple linear regression is the existence of a linear relationship between the response and the explanatory variables, which was displayed in the scatterplot above. 
+
+
+```{r, fig.align='center'}
+# Heat Linear Model
+heat_trans_lm_small <- lm(log(Heat) ~ log(WallA) + twoStories + 
+                      GlazingA + twoStories*GlazingA, data = heat)
+shapiro.test(heat_trans_lm_small$residuals)
 ```
+
+```{r, fig.align='center'}
+# Cool Linear Model
+cool_trans_lm_small <- lm(log(Cool) ~ log(WallA) + twoStories + 
+                      GlazingA + twoStories*GlazingA, data = cool) # best model so far
+shapiro.test(cool_trans_lm_small$residuals)
+```
+
+Next, we need normality, which assumes that the residuals are normally distributed. For this, we performed many Wilk-Shapiro tests and this is where we hit a wall. Despite our best efforts, we could not get our data to be normal. We were able to minimize the break of this assumption as much as possible, but we finally concluded that this is just a weakness from the data. Here are our other plots for this assumption:
+
+```{r, fig.align='center'}
+autoplot(heat_trans_lm_small)
+```
+
+```{r, fig.align='center'}
+autoplot(cool_trans_lm_small)
+```
+
+As the plots show, there is relatively normal distribution on the residuals, and this came after attempting many models to get the best fit for normality. This included the least deviation on the Q-Q plot and randomized scatting of the residuals across the fitted values.
+
+```{r, fig.align='center'}
+# Multicollinearity Plot
+continuous <- energy %>%
+  select(-twoStories, -RoofA, -SurfaceA)
+corrplot(cor(continuous), type = 'upper')
+```
+
+We also checked that there was no multicollinearity. This was shown in the above correlation plot. In a correlation matrices, the coefficients should ideally be below 0.80 which is the case aside from the correlation from heat and cool, which is a logical connection since they are opposites. 
+
+For the homoscedasticity assumption, the variance of error terms (residuals) should be consistent across all levels of the independent variables. A scatterplot of residuals versus predicted values should not display any discernible pattern, such as a cone-shaped distribution, which is not visible in the plots shown with the normality assumption. 
 
 # 2 Analyses, Results, and Interpretation
 
@@ -123,11 +161,72 @@ For each question of interest listed in Section 2, describe what regression mode
 Conduct the analysis in a logical fashion, including necessary code (and not any superfluous code) and its output.  Give simple interpretations of your findings related to the questions of interest.
 ```
 
+```{r, fig.align='center'}
+# Heat Linear Model
+anova(heat_trans_lm_small)
+```
+Heat Linear Model Anova Interpretation:
+
+The ANOVA results for the heat linear model indicate significant effects of various architectural factors on heating energy efficiency. Specifically:
+- **Wall Area (log(WallA)):** There is a highly significant effect (p < 0.001) of wall area on heating energy usage, with a large F-value of 2490.427.
+- **Number of Stories (twoStories):** Similarly, the number of stories in a building significantly impacts heating energy consumption (p < 0.001), with a substantial F-value of 7543.298.
+- **Glazing Area (GlazingA):** Glazing area also shows a significant effect (p < 0.001) on heating energy usage, with an F-value of 1022.256.
+- **Interaction Effect (twoStories:GlazingA):** The interaction between number of stories and glazing area is also significant (p = 1.482e-05), suggesting a combined influence on heating energy efficiency.
+
+```{r, fig.align='center'}
+# Cool Linear Model
+anova(cool_trans_lm_small)
+```
+
+Cool Linear Model Anova Interpretation:
+
+The ANOVA results for the cool linear model also reveals significant effects of architectural factors, but for cooling energy efficiency:
+- **Wall Area (log(WallA)):** Wall area significantly affects cooling energy usage (p < 0.001), with a high F-value of 1716.9988.
+- **Number of Stories (twoStories):** Similar to heating, the number of stories has a significant impact on cooling energy consumption (p < 0.001), with an F-value of 6325.5976.
+- **Glazing Area (GlazingA):** Glazing area also shows a significant effect (p < 0.001) on cooling energy usage, with an F-value of 437.9870.
+- **Interaction Effect (twoStories:GlazingA):** The interaction between number of stories and glazing area, however, is not significant (p = 0.2034), indicating no combined influence on cooling energy efficiency, which is an interesting difference from the heat model.
+
+
+```{r}
+confint(heat_trans_lm_small)
+```
+
+Confidence Intervals Interpretation for Heat Linear Model:
+
+Intercept: The 95% confidence interval for the intercept ranges from approximately -2.41 to -1.65. This suggests that, holding all other variables constant, the expected heating load varies between -2.41 and -1.65 KWh/$m^2$.
+Wall Area (log(WallA)): The 95% confidence interval for the coefficient of log(WallA) ranges from approximately 0.69 to 0.82. It implies that for each one-unit increase in the log of wall area, the log heating load is expected to increase between 1.991087 and 2.274926 KWh/$m^2$, holding all other variables constant.
+Number of Stories (twoStories1): The 95% confidence interval for the coefficient of the number of stories (twoStories1) ranges from approximately 0.83 to 0.90. It suggests that, compared to one-story buildings, two-story buildings are expected to have a log heating load between 0.83 and 0.90 KWh/$m^2$ higher, holding all other variables constant.
+Glazing Area (GlazingA): The 95% confidence interval for the coefficient of GlazingA ranges from approximately 1.10 to 1.29. It implies that for each one $m^2$ increase in glazing area, the log heating load is expected to increase between 1.10 and 1.29 KWh/$m^2$, holding all other variables constant.
+Interaction Effect (twoStories1:GlazingA): The 95% confidence interval for the coefficient of the interaction term ranges from approximately -0.42 to -0.16. It suggests that the effect of the interaction between number of stories and glazing area on the log heating load is expected to decrease between -0.42 and -0.16 KWh/$m^2$, holding all other variables constant.
+
+```{r}
+confint(cool_trans_lm_small)
+```
+
+Confidence Intervals Interpretation for Cool Linear Model:
+
+Intercept: The 95% confidence interval for the intercept ranges from approximately -0.70 to 0.01. This suggests that, holding all other variables constant, the expected log cooling load varies between -0.70 and 0.01 KWh/$m^2$.
+Wall Area (log(WallA)): The 95% confidence interval for the coefficient of log(WallA) ranges from approximately 0.45 to 0.58. It implies that for each one-unit increase in the log of wall area, the log cooling load is expected to increase between 0.45 and 0.58 KWh/$m^2$, holding all other variables constant.
+Number of Stories (twoStories1): The 95% confidence interval for the coefficient of the number of stories (twoStories1) ranges from approximately 0.66 to 0.73. It suggests that, compared to one-story buildings, two-story buildings are expected to have a log cooling load between 0.66 and 0.73 KWh/$m^2$ higher, holding all other variables constant.
+Glazing Area (GlazingA): The 95% confidence interval for the coefficient of GlazingA ranges from approximately 0.60 to 0.77. It implies that for each one $m^2$ increase in glazing area, the log cooling load is expected to increase between 0.60 and 0.77 KWh/$m^2$, holding all other variables constant.
+Interaction Effect (twoStories1:GlazingA): The 95% confidence interval for the coefficient of the interaction term ranges from approximately -0.20 to 0.04. It suggests that the effect of the interaction between number of stories and glazing area on the log cooling load is not statistically significant, as the interval includes zero.
+
+
+```{r, include=FALSE}
+dat <- data.frame(Compact = .75, WallA = 345, twoStories = 1, GlazingA = 0.1)
+dat$twoStories <- as.factor(dat$twoStories)
+
+predict(cool_trans_lm_small, newdata = dat, interval = 'confidence', level = .9)
+```
+
+INTERPRET PREDICTION INTERVAL HERE***
+
 # 3 Conclusions
 
 ```{text, include=FALSE}
 Give additional context to you results and interpretations from Section 5 with respect to the data set and its purpose.  Describe any potential weaknesses in your analysis, and how they may affect the reliability of the results.
 ```
+
 
 # 4 Contributions
 
@@ -141,3 +240,358 @@ For each member of the group, write a short paragraph describing their contribut
 If there are any analyses, such as exploratory plots/summaries or work you did to determine appropriate transformations, or any relevant material that does not belong in one of the sections above, these can go in the Appendix.  If you don't have any material like this, you can remove this section.
 ```
 
+```{r, eval=FALSE}
+library(tidyverse)
+library(ggfortify)
+library(corrplot)
+library(car)
+library(patchwork)
+library(bestglm)
+library(glmnet)
+library(readxl)
+set.seed(12345)
+
+energy <- read_csv("ENB2012_data.csv")
+energy <- as.data.frame(energy)
+
+# change col names
+colnames(energy) = c('Compact', 'SurfaceA', 'WallA', 'RoofA', 'twoStories', 'Orient', 'GlazingA', 'GlazingADist', 'Heat', 'Cool')
+
+# remove data we are not using
+energy$Orient <- NULL
+energy$GlazingADist <- NULL
+
+# change building height to categorical
+energy$twoStories <- ifelse(energy$twoStories == 7, 1, 0)
+energy$twoStories <- as.factor(energy$twoStories)
+summary(energy)
+
+# some visualization of the data
+ggplot(data = energy) +
+  geom_point(aes(x = Heat, y = Cool, color = twoStories))
+ggplot(data = energy) +
+  geom_boxplot(aes(x = twoStories, y = Heat))
+ggplot(data = energy) +
+  geom_point(aes(x = Compact, y = Heat, color = twoStories), position = 'jitter')
+ggplot(data = energy) +
+  geom_point(aes(x = SurfaceA, y = Heat, color = twoStories), position = 'jitter')
+ggplot(data = energy) +
+  geom_point(aes(x = WallA, y = Heat, color = twoStories), position = 'jitter')
+ggplot(data = energy) +
+  geom_point(aes(x = RoofA, y = Heat, color = twoStories), position = 'jitter')
+
+ggplot(data = energy) +
+  geom_point(aes(x = GlazingA, y = Heat, color = twoStories), position = 'jitter')
+# it looks like there will be some interaction terms with number of stories and 
+    # some of the other variables. Heating and cooling also look to be very 
+    # closely correlated
+
+
+# check for multicollinearity between continuous variables
+continuous <- energy %>%
+  select(-twoStories, -RoofA, -SurfaceA)
+corrplot(cor(continuous), type = 'upper')
+round(cor(continuous),2)
+# it looks like there is some multicollinearity between the variables
+
+# create a full linear model for both heating and cooling
+heating_lm <- lm(Heat ~ Compact + SurfaceA + WallA + RoofA + twoStories + 
+                   GlazingA, data = energy)
+cooling_lm <- lm(Cool ~ Compact + SurfaceA + WallA + RoofA + twoStories + 
+                   GlazingA, data = energy)
+summary(heating_lm)
+summary(cooling_lm)
+avPlots(heating_lm)
+avPlots(cooling_lm)
+#vif(heating_lm)
+# both models removed Roof Area, i think because it is perfectly multicollinear
+# with number of stories
+
+
+# check diagnostics on base models
+autoplot(heating_lm)
+autoplot(heating_lm, which = 4)
+autoplot(cooling_lm)
+autoplot(cooling_lm, which = 4)
+shapiro.test(heating_lm$residuals)
+hist(heating_lm$residuals)
+boxplot(heating_lm$residuals)
+shapiro.test(cooling_lm$residuals)
+hist(cooling_lm$residuals)
+boxplot(cooling_lm$residuals)
+# neither model has normally distributed errors and there could some problems
+# equality of variance
+
+# Interactions
+anova <- aov(Heat ~ Compact*twoStories + SurfaceA*twoStories + WallA*twoStories
+             + GlazingA, data = energy)
+summary(anova)
+interaction.plot(x.factor = energy$Compact, 
+                 trace.factor = energy$twoStories, 
+                 response = energy$Heat)
+interaction.plot(x.factor = energy$SurfaceA, 
+                 trace.factor = energy$twoStories, 
+                 response = energy$Heat)
+interaction.plot(x.factor = energy$WallA, 
+                 trace.factor = energy$twoStories, 
+                 response = energy$Heat)
+interaction.plot(x.factor = energy$RoofA, 
+                 trace.factor = energy$twoStories, 
+                 response = energy$Heat)
+interaction.plot(x.factor = energy$GlazingA, 
+                 trace.factor = energy$twoStories, 
+                 response = energy$Heat)
+
+interaction.plot(x.factor = energy$GlazingA, 
+                 trace.factor = energy$Compact, 
+                 response = energy$Heat)
+
+# looks like number of stories has an interaction with  compact, surface area,
+# and wall area
+
+# fit a new model with the interaction terms
+heat_interax_lm <- lm(Heat ~ Compact + SurfaceA + WallA + twoStories + 
+                        GlazingA + WallA*twoStories + Compact*twoStories + 
+                        SurfaceA*twoStories, data = energy)
+cool_interax_lm <- lm(Cool ~ Compact + SurfaceA + WallA + twoStories + 
+                        GlazingA + WallA*twoStories + Compact*twoStories + 
+                        SurfaceA*twoStories, data = energy)
+summary(heat_interax_lm)
+summary(cool_interax_lm)
+autoplot(heat_interax_lm)
+autoplot(cool_interax_lm)
+shapiro.test(heat_interax_lm$residuals)
+shapiro.test(cool_interax_lm$residuals)
+hist(heat_interax_lm$residuals)
+hist(cool_interax_lm$residuals)
+# a model with all the interactions still has the same problems
+
+
+# Variable Selection/Shrinkage
+heat <- energy %>%
+  select(Compact, SurfaceA, WallA, RoofA, twoStories, GlazingA, Heat)
+cool <- energy %>%
+  select(Compact, SurfaceA, WallA, RoofA, twoStories, GlazingA, Cool)
+heat <- as.data.frame(heat)
+cool <- as.data.frame(cool)
+heat_x <- as.matrix(heat[, 1:6]) 
+heat_y <- heat[, 7]
+cool_x <- as.matrix(cool[, 1:6]) 
+cool_y <- cool[, 7]
+## Ridge
+heat_ridge_cv <- cv.glmnet(x = heat_x,
+                          y = heat_y, 
+                          type.measure = "mse", 
+                          alpha = 0)
+autoplot(heat_ridge_cv, label = FALSE) +
+  theme_bw() +
+  theme(aspect.ratio = 1)
+heat_ridge_cv$lambda.1se
+coef(heat_ridge_cv, s = "lambda.1se")
+
+cool_ridge_cv <- cv.glmnet(x = cool_x,
+                           y = cool_y, 
+                           type.measure = "mse", 
+                           alpha = 0)
+autoplot(cool_ridge_cv, label = FALSE) +
+  theme_bw() +
+  theme(aspect.ratio = 1)
+cool_ridge_cv$lambda.1se
+coef(cool_ridge_cv, s = "lambda.1se")
+## LASSO
+heat_lasso_cv <- cv.glmnet(x = heat_x,
+                           y = heat_y, 
+                           type.measure = "mse", 
+                           alpha = 1)
+autoplot(heat_lasso_cv, label = FALSE) +
+  theme_bw() +
+  theme(aspect.ratio = 1)
+heat_lasso_cv$lambda.1se
+coef(heat_lasso_cv, s = "lambda.1se")
+
+
+cool_lasso_cv <- cv.glmnet(x = cool_x,
+                           y = cool_y, 
+                           type.measure = "mse", 
+                           alpha = 1)
+autoplot(cool_lasso_cv, label = FALSE) +
+  theme_bw() +
+  theme(aspect.ratio = 1)
+cool_lasso_cv$lambda.1se
+coef(cool_lasso_cv, s = "lambda.1se")
+## Elastic Net
+heat_net_cv <- cv.glmnet(x = heat_x,
+                           y = heat_y, 
+                           type.measure = "mse", 
+                           alpha = 0.5)
+autoplot(heat_net_cv, label = FALSE) +
+  theme_bw() +
+  theme(aspect.ratio = 1)
+heat_net_cv$lambda.1se
+coef(heat_net_cv, s = "lambda.1se")
+
+
+cool_net_cv <- cv.glmnet(x = cool_x,
+                         y = cool_y, 
+                         type.measure = "mse", 
+                         alpha = 0.5)
+autoplot(cool_net_cv, label = FALSE) +
+  theme_bw() +
+  theme(aspect.ratio = 1)
+cool_net_cv$lambda.1se
+coef(cool_net_cv, s = "lambda.1se")
+## Forward
+base_mod <- lm(Heat ~ 1, data = heat) 
+full_mod <- lm(Heat ~ ., data = heat) 
+base_mod_cool <- lm(Cool ~ 1, data = cool) 
+full_mod_cool <- lm(Cool ~ ., data = cool)
+forw_BIC <- step(base_mod,
+                 direction = "forward", 
+                 scope=list(lower= base_mod, upper= full_mod),
+                 k = log(nrow(heat)))
+summary(forw_BIC)
+
+
+forw_BIC_cool <- step(base_mod_cool,
+                 direction = "forward", 
+                 scope=list(lower= base_mod_cool, upper= full_mod_cool),
+                 k = log(nrow(cool)))
+summary(forw_BIC_cool)
+## Backward
+back_BIC <- step(full_mod,
+                 direction = "backward", 
+                 scope=list(lower= base_mod, upper= full_mod),
+                 k = log(nrow(heat)))
+summary(back_BIC)
+
+
+back_BIC_cool <- step(full_mod_cool,
+                 direction = "backward", 
+                 scope=list(lower= base_mod_cool, upper= full_mod_cool),
+                 k = log(nrow(cool)))
+summary(back_BIC_cool)
+## Sequential
+full_seq_BIC <- step(full_mod,
+                     direction = "both", 
+                     scope=list(lower= base_mod, upper= full_mod),
+                     k=log(nrow(heat)))
+summary(full_seq_BIC)
+
+
+full_seq_BIC_cool <- step(full_mod_cool,
+                     direction = "both", 
+                     scope=list(lower= base_mod_cool, upper= full_mod_cool),
+                     k=log(nrow(cool)))
+summary(full_seq_BIC_cool)
+
+# all the models for both explanatory variables agree to remove roof area and 
+    # keep compact, wall area, stories, and glazing area. LASSO and Net say
+    # remove surface area, forward and backward say keep it
+
+
+invTranPlot(log(Heat) ~ Compact , data = heat, lambda = c(-1,0,1,2))
+invTranPlot(log(Heat) ~ WallA , data = heat, lambda = c(-1,0,1,2))
+invTranPlot(log(Heat) ~ GlazingA, data = heat, lambda = c(-1,0,1,2))
+
+
+invTranPlot(log(Cool) ~ Compact , data = cool, lambda = c(-1,0,1,2))
+invTranPlot(log(Cool) ~ WallA , data = cool, lambda = c(-1,0,1,2))
+
+bc = boxCox(heating_lm)
+lambda.opt = bc$x[which.max(bc$y)]
+lambda.opt
+heat_trans_lm <- lm(log(Heat) ~ 1/(WallA**2) + twoStories + 
+                      GlazingA + twoStories*GlazingA, data = heat)
+
+cool_trans_lm <- lm(log(Cool) ~ log(Compact) + log(WallA) + twoStories + 
+                      GlazingA + twoStories*GlazingA, data = cool)
+
+#######
+# MAIN MODELS
+
+# Heat Linear Model
+heat_trans_lm_small <- lm(log(Heat) ~ log(WallA) + twoStories + 
+                      GlazingA + twoStories*GlazingA, data = heat)
+
+autoplot(heat_trans_lm_small)
+anova(heat_trans_lm_small)
+confint(heat_trans_lm_small)
+shapiro.test(heat_trans_lm_small$residuals)
+summary(heat_trans_lm_small)
+
+# Cool Linear Model
+cool_trans_lm_small <- lm(log(Cool) ~ log(WallA) + twoStories + 
+                      GlazingA + twoStories*GlazingA, data = cool)
+
+autoplot(cool_trans_lm_small)
+anova(cool_trans_lm_small)
+confint(cool_trans_lm_small)
+shapiro.test(cool_trans_lm_small$residuals)
+summary(cool_trans_lm_small)
+
+dat <- data.frame(Compact = .75, WallA = 345, twoStories = 1, GlazingA = 0.1)
+dat$twoStories <- as.factor(dat$twoStories)
+
+predict(cool_trans_lm_small, newdata = dat, interval = 'confidence', level = .9)
+
+######
+
+autoplot(cool_trans_lm)
+
+hist(cool_trans_lm$residuals)
+boxplot(cool_trans_lm$residuals)
+
+summary(heat_trans_lm)
+autoplot(heat_trans_lm)
+shapiro.test(heat_trans_lm$residuals)
+hist(heat_trans_lm$residuals)
+boxplot(heat_trans_lm$residuals)
+
+ggplot(data = heat)+
+  geom_point(aes(x = log(Compact), y = log(Heat), color = twoStories))+
+  geom_line(mapping = aes(x = log(Compact),
+                          y = predict(heat_trans_lm), 
+                          color = twoStories))
+ggplot(data = heat)+
+  geom_point(aes(x = 1/(WallA**2), y = log(Heat), color = twoStories))+
+  geom_line(mapping = aes(x = 1/(WallA**2),
+                          y = predict(heat_trans_lm), 
+                          color = twoStories))
+ggplot(data = heat)+
+  geom_point(aes(x = GlazingA, y = log(Heat), color = twoStories))+
+  geom_line(mapping = aes(x = GlazingA,
+                          y = predict(heat_trans_lm), 
+                          color = twoStories))
+
+cool_reduced_log_model <- lm(Cool ~ sqrt(WallA) + twoStories + sqrt(GlazingA) + twoStories*WallA, data = energy)
+cool_reduced <- lm(sqrt(Cool) ~ sqrt(WallA) + twoStories + sqrt(GlazingA), data = energy)
+heat_reduced_log_model <- lm(sqrt(Heat) ~ Compact + sqrt(WallA) + twoStories + sqrt(GlazingA), data = energy)
+heat$residuals <- heat_reduced_log_model$residuals
+cor(energy)
+
+ggplot(data = heat) +
+  geom_point(mapping = aes(x = Compact, y = residuals)) +
+  theme(aspect.ratio = 1)
+
+ggplot(data = heat) +
+  geom_point(mapping = aes(x = sqrt(WallA), y = residuals)) +
+  theme(aspect.ratio = 1)
+ggplot(data = heat) +
+  geom_point(mapping = aes(x = sqrt(GlazingA), y = residuals)) +
+  theme(aspect.ratio = 1)
+
+autoplot(heat_reduced_log_model)
+autoplot(heat_reduced_log_model, which = 4)
+autoplot(cool_reduced)
+
+autoplot(cool_reduced_log_model)
+autoplot(cool_reduced_log_model, which = 4)
+
+shapiro.test(heat_reduced_log_model$residuals)
+hist(heat_reduced_log_model$residuals)
+boxplot(heat_reduced_log_model$residuals)
+
+shapiro.test(cool_reduced_log_model$residuals)
+hist(cool_reduced_log_model$residuals)
+boxplot(cool_reduced_log_model$residuals)
+```
