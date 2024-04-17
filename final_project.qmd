@@ -134,15 +134,41 @@ shapiro.test(cool_trans_lm_small$residuals)
 
 Next, we need normality, which assumes that the residuals are normally distributed. For this, we performed many Wilk-Shapiro tests and this is where we hit a wall. Despite our best efforts, we could not get our data to be normal. We were able to minimize the break of this assumption as much as possible, but we finally concluded that this is just a weakness from the data. Here are our other plots for this assumption:
 
+Heat Model Boxplot:
+```{r, fig.align='center'}
+# Heat Model Boxplot
+boxplot(heat_trans_lm_small$residuals)
+```
+
+Cool Model Boxplot:
+```{r, fig.align='center'}
+# Cool Model Boxplot
+boxplot(cool_trans_lm_small$residuals)
+```
+
+Heat Model Histogram:
+```{r, fig.align='center'}
+# Heat Model Histogram
+hist(heat_trans_lm_small$residuals)
+```
+
+Cool Model Histogram:
+```{r, fig.align='center'}
+# Cool Model Histogram
+hist(cool_trans_lm_small$residuals)
+```
+
+Heat Model Diagnostic Plots:
 ```{r, fig.align='center'}
 autoplot(heat_trans_lm_small)
 ```
 
+Cool Model Diagnostic Plots:
 ```{r, fig.align='center'}
 autoplot(cool_trans_lm_small)
 ```
 
-As the plots show, there is relatively normal distribution on the residuals, and this came after attempting many models to get the best fit for normality. This included the least deviation on the Q-Q plot and randomized scatting of the residuals across the fitted values.
+As the plots show, there is relatively normal distribution on the residuals, and this came after attempting many models to get the best fit for normality. Going in order, the break to the normality is most visible in the boxplots for the two models. We could not get rid of the outliers despite our best efforts. Moving on to the histograms, we see the normality curve take shape, especially with the cool model. Finally in the diagnostic plots, this was the best we could do to get the data as normally distributed as possible. This includes the least deviation on the Q-Q plot and randomized scatting of the residuals across the fitted values.
 
 ```{r, fig.align='center'}
 # Multicollinearity Plot
@@ -161,10 +187,24 @@ For the homoscedasticity assumption, the variance of error terms (residuals) sho
 Conduct the analysis in a logical fashion, including necessary code (and not any superfluous code) and its output.  Give simple interpretations of your findings related to the questions of interest.
 ```
 
+Below are the summaries for both the heat and cool models as well as interpretations for them.
+
 ```{r, fig.align='center'}
 # Heat Linear Model
-anova(heat_trans_lm_small)
+summary(heat_trans_lm_small)
 ```
+
+The linear model for heating load suggests significant effects of architectural features on energy consumption. The intercept, -2.03, represents the expected log heating load when all predictor variables are zero. The coefficient for log(WallA) indicates that for each one-unit increase in the log of wall area (in $m^2$), the log heating load increases by approximately 0.76 KWh/$m^2$ Similarly, the coefficient for the number of stories (twoStories1) suggests that two-story buildings have a log heating load approximately 0.86 KWh/$m^2$ higher than one-story buildings. Glazing area (GlazingA) also significantly affects the heating load, with each one $m^2$ increase leading to a log heating load increase of about 1.19 KWh/$m^2$. The interaction term between number of stories and glazing area (twoStories1:GlazingA) indicates that the effect of glazing area on heating load varies depending on the number of stories.
+
+```{r, fig.align='center'}
+# Cool Linear Model
+summary(cool_trans_lm_small)
+```
+
+The linear model for cooling load also highlights substantial influences of architectural features on energy consumption. The intercept, -0.34, represents the expected log cooling load when all predictor variables are zero. The coefficient for log(WallA) suggests that each one-unit increase in the log of wall area (in $m^2$) leads to a log cooling load increase of approximately 0.52 KWh/$m^2$. Similarly, the coefficient for the number of stories (twoStories1) indicates that two-story buildings have a log cooling load approximately 0.70 KWh/$m^2$ higher than one-story buildings. Glazing area (GlazingA) significantly affects the cooling load, with each one $m^2$ increase resulting in a log cooling load increase of about 0.68 KWh/$m^2$. However, the interaction term between number of stories and glazing area (twoStories1:GlazingA) is not statistically significant, suggesting no significant interaction effect on cooling load.
+
+#### Anova Result Interpretations (see the anova test code in the appendix):
+
 Heat Linear Model Anova Interpretation:
 
 The ANOVA results for the heat linear model indicate significant effects of various architectural factors on heating energy efficiency. Specifically:
@@ -172,11 +212,6 @@ The ANOVA results for the heat linear model indicate significant effects of vari
 - **Number of Stories (twoStories):** Similarly, the number of stories in a building significantly impacts heating energy consumption (p < 0.001), with a substantial F-value of 7543.298.
 - **Glazing Area (GlazingA):** Glazing area also shows a significant effect (p < 0.001) on heating energy usage, with an F-value of 1022.256.
 - **Interaction Effect (twoStories:GlazingA):** The interaction between number of stories and glazing area is also significant (p = 1.482e-05), suggesting a combined influence on heating energy efficiency.
-
-```{r, fig.align='center'}
-# Cool Linear Model
-anova(cool_trans_lm_small)
-```
 
 Cool Linear Model Anova Interpretation:
 
@@ -243,6 +278,14 @@ Future research could aim to add more variables to the models or to create a ran
 ```{text, include=FALSE}
 For each member of the group, write a short paragraph describing their contribution to this project and the report.  It is up to you to decide how to divide up the work, so long as everyone is contributing approximately equally.
 ```
+
+Zach Perry - 
+
+Spencer Wilson - 
+
+Walter Vogelmann - For my portion of this assignment, once we had met together and decided not only on the data set and model including the variables, I worked on the formatting and organization of the report. I put together what was shown here in sections 1.3 and 2, including the regression method and assumption graphs and summaries, the tables and interpretations for the model summary commands, the anova evaluations, the confidence interval explanations, as well as the appendix. Overall, my role consisted of interpretation and reporting of data and diagnostics.
+
+Andrew Pochman - 
 
 ## APPENDIX
 
