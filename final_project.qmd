@@ -29,7 +29,7 @@ library(readxl)
 set.seed(12345)
 ```
 
-```{r setup, include=FALSE}
+```{r, include=FALSE}
 energy <- read_csv("ENB2012_data.csv")
 energy <- as.data.frame(energy)
 
@@ -48,7 +48,7 @@ energy$twoStories <- as.factor(energy$twoStories)
 
 # Abstract
 
-Here, you will briefly summarize the entire report, including the data used, questions of interest, and relevant findings.
+This study developed a linear regression model to predict the impact of various architectural design features on climate control energy efficiency. Key variables tested included volume to surface area ratio, floor plan area, area of external walls, number of stories, and area of windows, aiming to predict heating or cooling load in KWh per square meter. Significant predictors identified were area of external walls, number of stories, area of windows, and the interaction between number of stories and area of windows. External wall area showed the highest coefficient, indicating increased difficulty in heating and cooling control with a more robust exterior. Additionally, increases in area—whether through stories, window area, or their interaction—increased heating and cooling load, with a larger impact on heating load compared to cooling. Despite meeting assumptions of independent sampling, no influential points, and equal variance, the model struggled with normality issues in residuals, affecting precision and potentially reliability. Findings suggest that reducing external wall area, minimizing windows, and limiting the number of stories can decrease energy consumption for climate control. The models developed can aid in predicting energy consumption for architectural projects or for individuals considering energy efficiency in residences. Future research could explore additional variables and consider models like random forests to address normality issues.
 
 # 1 Problem and Motivation
 
@@ -56,9 +56,9 @@ Here, you will briefly summarize the entire report, including the data used, que
 In this section, you will describe the background information about the study that is necessary to understand why the data are important.  In other words, why was it important to gather the data in the first place?
 ```
 
-This study was done to examine the effects of architectural design features on the energy efficiency of building design. Heating and cooling contribute to a significant portion of energy usage in many buildings around the world. By using sound architectural principles, we can reduce energy consts and carbon emissions. These data can help us to understand what design features are most connected with reduced energy usage. It's important to focus conservation efforts on the vectors that matter most.
+This study was done to examine the effects of architectural design features on the energy efficiency of building design. Heating and cooling contribute to a significant portion of energy usage in many buildings around the world. By using sound architectural principles, we can reduce energy costs and carbon emissions. These data can help us to understand what design features are most connected with reduced energy usage. It's important to focus conservation efforts on the vectors that matter most.
 
-In the study, they simulated the effects of several different factors that might affect the energy usage in cooling or heating a building. In addition, they reported slightly different effects of these factors on the heating cost and cooling cost individually.
+In our chosen study, researchers simulated the effects of several different factors that might affect energy usage when cooling or heating a building. In addition, they reported slightly different effects of these factors on the heating cost and cooling costs individually.
 
 The following graph illustrates this idea. It compares the energy usage for heating and cooling:
 
@@ -75,7 +75,7 @@ ggplot(data = energy) +
   
 ```
 
-We'll compare and contrast the effects of different factors on heating and cooling later, but it's interesting to note visually the relationship between heating costs and cooling costs. Rarely will a building be very efficient at heating but not at cooling or vice-versa. You can also see the effect of the number of stories a house has; many of the two story houses needed more energy for both heating and cooling.
+We'll compare and contrast the effects of different factors on heating and cooling; it's interesting to note visually the relationship between heating costs and cooling costs. Rarely will a building be very efficient at heating but not at cooling or vice-versa. You can also see the effect of the number of stories a house has; many of the two story houses needed more energy for both heating and cooling.
 
 ## 1.1 Data Description
 
@@ -103,9 +103,9 @@ This data was originally sampled from architectural simulation software (Ecotect
 Briefly and clearly state the two main questions that you will investigate throughout the report.  These questions should be stated in scientific, and not statistical language.  For example, "Is the slope of log of per capita GDP significantly different from zero?" should instead by give as "Does the log of per capita GDP have an effect on the average life expectancy of females in a given country?"
 ```
 
-Do architectural factors such as the dimensions of the walls and roof, the size of windows, and overall compactness of a house have an effect on the energy efficiency of keeping it cool?
+Do architectural factors such as the dimensions of the walls and roof, the size of windows, and overall compactness of a house have an effect on its energy efficiency when cooling?
 
-Do these same factors have a different effect on the efficiency of warming the house?
+Do these same factors have a different effect on the efficiency when warming the house?
 
 ## 1.3 Regression Methods
 
@@ -121,14 +121,14 @@ First in our assumptions is a linear relationship. The core premise of multiple 
 ```{r, fig.align='center'}
 # Heat Linear Model
 heat_trans_lm_small <- lm(log(Heat) ~ log(WallA) + twoStories + 
-                      GlazingA + twoStories*GlazingA, data = heat)
+                      GlazingA + twoStories*GlazingA, data = energy)
 shapiro.test(heat_trans_lm_small$residuals)
 ```
 
 ```{r, fig.align='center'}
 # Cool Linear Model
 cool_trans_lm_small <- lm(log(Cool) ~ log(WallA) + twoStories + 
-                      GlazingA + twoStories*GlazingA, data = cool) # best model so far
+                      GlazingA + twoStories*GlazingA, data = energy) # best model so far
 shapiro.test(cool_trans_lm_small$residuals)
 ```
 
@@ -194,7 +194,7 @@ confint(heat_trans_lm_small)
 Confidence Intervals Interpretation for Heat Linear Model:
 
 Intercept: The 95% confidence interval for the intercept ranges from approximately -2.41 to -1.65. This suggests that, holding all other variables constant, the expected heating load varies between -2.41 and -1.65 KWh/$m^2$.
-Wall Area (log(WallA)): The 95% confidence interval for the coefficient of log(WallA) ranges from approximately 0.69 to 0.82. It implies that for each one-unit increase in the log of wall area, the log heating load is expected to increase between 1.991087 and 2.274926 KWh/$m^2$, holding all other variables constant.
+Wall Area (log(WallA)): The 95% confidence interval for the coefficient of log(WallA) ranges from approximately 0.69 to 0.82. It implies that for each one-unit increase in wall area, the log heating load is expected to increase between 1.991087 and 2.274926 KWh/$m^2$, holding all other variables constant.
 Number of Stories (twoStories1): The 95% confidence interval for the coefficient of the number of stories (twoStories1) ranges from approximately 0.83 to 0.90. It suggests that, compared to one-story buildings, two-story buildings are expected to have a log heating load between 0.83 and 0.90 KWh/$m^2$ higher, holding all other variables constant.
 Glazing Area (GlazingA): The 95% confidence interval for the coefficient of GlazingA ranges from approximately 1.10 to 1.29. It implies that for each one $m^2$ increase in glazing area, the log heating load is expected to increase between 1.10 and 1.29 KWh/$m^2$, holding all other variables constant.
 Interaction Effect (twoStories1:GlazingA): The 95% confidence interval for the coefficient of the interaction term ranges from approximately -0.42 to -0.16. It suggests that the effect of the interaction between number of stories and glazing area on the log heating load is expected to decrease between -0.42 and -0.16 KWh/$m^2$, holding all other variables constant.
@@ -226,6 +226,16 @@ INTERPRET PREDICTION INTERVAL HERE***
 ```{text, include=FALSE}
 Give additional context to you results and interpretations from Section 5 with respect to the data set and its purpose.  Describe any potential weaknesses in your analysis, and how they may affect the reliability of the results.
 ```
+
+This study aimed to create a linear regression model to predict how various architecture design features impact climate control energy efficiency. The main variables we were interested in testing include volume to surface area ratio, the floor plan area, the area of external walls, number of stories, and the area of windows. Using these predictors, we attempted to predict the amount of heat added or removed in KWh per square meter (heating or cooling load). 
+
+We found the area of external walls, the number of stories, the area of windows, and the combination effect of the number of stories and the area of windows to be significant predictors of energy efficiency. The predictor with the highest coefficient was external wall area, suggesting that a more robust exterior to architecture increases the heating and cooling load more than any other variable, making it harder to add or remove heat when more window area is present. As stated, this trend was relevant for both heating and cool load, although it can be important to note that a larger external wall area did place a higher load on heating as compared to cooling. Similarly to external wall area, an increase in area, whether it be area increased by stories, area of windows, or an interaction of the two predictors also increases heating and cooling load. 
+
+Our models aimed to use these significant variables to make models that can predict heating and cooling load. When testing model assumptions, we ran into some issues with normality. Other assumptions such as independent sampling, no influential points, and equal variance were met, however our model was unable to explain variance in the tail even after multiple attempts at transforming the data using logarithmic and exponential transformations. This caused normality issues in the residuals which were noted before moving on. The largest impact of non-normal residuals is increased variance in our results. We were still able to identify trends, but our coefficients had larger than optimal margins of error which decreased our model's precision and potentially its reliability.
+
+Our findings have important implications for real world architextural design practice. If heating and cooling load is a concern, whether for financial or environmental reasons, houses should decrease external wall area where possible. Removing windows and limiting the number of stories in a building also decrease energy consumption when under heating and cooling loads. Our models can assist in predicting climate control energy consumption for potential architectural projects or for buyers weighing the cost of energy efficiency for a new residence.
+
+Future research could aim to add more variables to the models or to create a random forest model, which would not be as restrained by normality issues. Placement of air conditioning or heating units within a home, types of units, and average room size are other factors that have the potential to impact heating and cooling load. Future studies could dive into more nuanced effects of those factors and their interactions with our included predictors.  
 
 
 # 4 Contributions
