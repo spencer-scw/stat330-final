@@ -285,7 +285,7 @@ Spencer Wilson -
 
 Walter Vogelmann - For my portion of this assignment, once we had met together and decided not only on the data set and model including the variables, I worked on the formatting and organization of the report. I put together what was shown here in sections 1.3 and 2, including the regression method and assumption graphs and summaries, the tables and interpretations for the model summary commands, the anova evaluations, the confidence interval explanations, as well as the appendix. Overall, my role consisted of interpretation and reporting of data and diagnostics.
 
-Andrew Pochman - 
+Andrew Pochman - For this report, I helped the team pick the best model for each heating and cooling. After the model and code was created and analyses were completed, I worked to write the conclusions of the report and the abstract at the beginning. This included consolidating the general trends and providing summarized variable conclusions, model limitations, and potential future research.
 
 ## APPENDIX
 
