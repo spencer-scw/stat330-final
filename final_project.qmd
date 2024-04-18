@@ -279,8 +279,8 @@ Future research could aim to add more variables to the models or to create a ran
 For each member of the group, write a short paragraph describing their contribution to this project and the report.  It is up to you to decide how to divide up the work, so long as everyone is contributing approximately equally.
 ```
 
-Zach Perry - 
-
+Zach Perry - My  contributions to this project consisted of doing most of the coding. Like cleaning the data and the early data exploration and visualization as well as checking all the model assumptions and potential interactions. I also did the 
+initial variable selection and collaborated with the rest of the team to determine the best model for analysis 
 Spencer Wilson - 
 
 Walter Vogelmann - For my portion of this assignment, once we had met together and decided not only on the data set and model including the variables, I worked on the formatting and organization of the report. I put together what was shown here in sections 1.3 and 2, including the regression method and assumption graphs and summaries, the tables and interpretations for the model summary commands, the anova evaluations, the confidence interval explanations, as well as the appendix. Overall, my role consisted of interpretation and reporting of data and diagnostics.
