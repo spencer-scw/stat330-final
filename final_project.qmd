@@ -132,7 +132,7 @@ cool_trans_lm_small <- lm(log(Cool) ~ log(WallA) + twoStories +
 shapiro.test(cool_trans_lm_small$residuals)
 ```
 
-Next, we need normality, which assumes that the residuals are normally distributed. For this, we performed many Wilk-Shapiro tests and this is where we hit a wall. Despite our best efforts, we could not get our data to be normal. We were able to minimize the break of this assumption as much as possible, but we finally concluded that this is just a weakness from the data. Here are our other plots for this assumption:
+Next, we need normality, which assumes that the residuals are normally distributed. Our intial models failed this assumption. In an attempt to fix that we attempted many variable transformations. Despite our best efforts, we could not get our residuals to be normal. We were able to minimize the break of this assumption as much as possible, but we finally concluded that this is just a weakness from the data. Here are our other plots for this assumption:
 
 Heat Model Boxplot:
 ```{r, fig.align='center'}
@@ -179,7 +179,7 @@ corrplot(cor(continuous), type = 'upper')
 
 We also checked that there was no multicollinearity. This was shown in the above correlation plot. In a correlation matrices, the coefficients should ideally be below 0.80 which is the case aside from the correlation from heat and cool, which is a logical connection since they are opposites. 
 
-For the homoscedasticity assumption, the variance of error terms (residuals) should be consistent across all levels of the independent variables. A scatterplot of residuals versus predicted values should not display any discernible pattern, such as a cone-shaped distribution, which is not visible in the plots shown with the normality assumption. 
+For the homoscedasticity assumption, the variance of residuals should be consistent across all levels of the independent variables. A scatterplot of residuals versus predicted values should not display any discernible pattern, such as a cone-shaped distribution, which is not visible in the plots shown with the normality assumption. 
 
 # 2 Analyses, Results, and Interpretation
 
@@ -194,33 +194,14 @@ Below are the summaries for both the heat and cool models as well as interpretat
 summary(heat_trans_lm_small)
 ```
 
-The linear model for heating load suggests significant effects of architectural features on energy consumption. The intercept, -2.03, represents the expected log heating load when all predictor variables are zero. The coefficient for log(WallA) indicates that for each one-unit increase in the log of wall area (in $m^2$), the log heating load increases by approximately 0.76 KWh/$m^2$ Similarly, the coefficient for the number of stories (twoStories1) suggests that two-story buildings have a log heating load approximately 0.86 KWh/$m^2$ higher than one-story buildings. Glazing area (GlazingA) also significantly affects the heating load, with each one $m^2$ increase leading to a log heating load increase of about 1.19 KWh/$m^2$. The interaction term between number of stories and glazing area (twoStories1:GlazingA) indicates that the effect of glazing area on heating load varies depending on the number of stories.
+The linear model for heating load suggests significant effects of architectural features on energy consumption. Our model has an adjusted R^2 of .9352, meaning that 93% of the variation in heating load can be explained by our model. The intercept, -2.03, represents the expected log heating load when all predictor variables are zero. The coefficient for log(WallA) indicates that for each one-unit increase in the log of wall area (in $m^2$), the log heating load increases by approximately 0.76 KWh/$m^2$ Similarly, the coefficient for the number of stories (twoStories1) suggests that two-story buildings have a log heating load approximately 0.86 KWh/$m^2$ higher than one-story buildings. Glazing area (GlazingA) also significantly affects the heating load, with each one $m^2$ increase leading to a log heating load increase of about 1.19 KWh/$m^2$. The interaction term between number of stories and glazing area (twoStories1:GlazingA) indicates that the effect of glazing area on heating load varies depending on the number of stories. The results of the global F-test show that at least one of our predictor variables has a relationship with heating load.
 
 ```{r, fig.align='center'}
 # Cool Linear Model
 summary(cool_trans_lm_small)
 ```
 
-The linear model for cooling load also highlights substantial influences of architectural features on energy consumption. The intercept, -0.34, represents the expected log cooling load when all predictor variables are zero. The coefficient for log(WallA) suggests that each one-unit increase in the log of wall area (in $m^2$) leads to a log cooling load increase of approximately 0.52 KWh/$m^2$. Similarly, the coefficient for the number of stories (twoStories1) indicates that two-story buildings have a log cooling load approximately 0.70 KWh/$m^2$ higher than one-story buildings. Glazing area (GlazingA) significantly affects the cooling load, with each one $m^2$ increase resulting in a log cooling load increase of about 0.68 KWh/$m^2$. However, the interaction term between number of stories and glazing area (twoStories1:GlazingA) is not statistically significant, suggesting no significant interaction effect on cooling load.
-
-#### Anova Result Interpretations (see the anova test code in the appendix):
-
-Heat Linear Model Anova Interpretation:
-
-The ANOVA results for the heat linear model indicate significant effects of various architectural factors on heating energy efficiency. Specifically:
-- **Wall Area (log(WallA)):** There is a highly significant effect (p < 0.001) of wall area on heating energy usage, with a large F-value of 2490.427.
-- **Number of Stories (twoStories):** Similarly, the number of stories in a building significantly impacts heating energy consumption (p < 0.001), with a substantial F-value of 7543.298.
-- **Glazing Area (GlazingA):** Glazing area also shows a significant effect (p < 0.001) on heating energy usage, with an F-value of 1022.256.
-- **Interaction Effect (twoStories:GlazingA):** The interaction between number of stories and glazing area is also significant (p = 1.482e-05), suggesting a combined influence on heating energy efficiency.
-
-Cool Linear Model Anova Interpretation:
-
-The ANOVA results for the cool linear model also reveals significant effects of architectural factors, but for cooling energy efficiency:
-- **Wall Area (log(WallA)):** Wall area significantly affects cooling energy usage (p < 0.001), with a high F-value of 1716.9988.
-- **Number of Stories (twoStories):** Similar to heating, the number of stories has a significant impact on cooling energy consumption (p < 0.001), with an F-value of 6325.5976.
-- **Glazing Area (GlazingA):** Glazing area also shows a significant effect (p < 0.001) on cooling energy usage, with an F-value of 437.9870.
-- **Interaction Effect (twoStories:GlazingA):** The interaction between number of stories and glazing area, however, is not significant (p = 0.2034), indicating no combined influence on cooling energy efficiency, which is an interesting difference from the heat model.
-
+The linear model for cooling load also highlights substantial influences of architectural features on energy consumption. This model has an R^2 of .917, which is slightly lower than the model for heating. The intercept, -0.34, represents the expected log cooling load when all predictor variables are zero. The coefficient for log(WallA) suggests that each one-unit increase in the log of wall area (in $m^2$) leads to a log cooling load increase of approximately 0.52 KWh/$m^2$. Similarly, the coefficient for the number of stories (twoStories1) indicates that two-story buildings have a log cooling load approximately 0.70 KWh/$m^2$ higher than one-story buildings. Glazing area (GlazingA) significantly affects the cooling load, with each one $m^2$ increase resulting in a log cooling load increase of about 0.68 KWh/$m^2$. However, the interaction term between number of stories and glazing area (twoStories1:GlazingA) is not statistically significant, suggesting no significant interaction effect on cooling load. The results of the global F-test show that at least one of our predictor variables has a relationship with cooling load.
 
 ```{r}
 confint(heat_trans_lm_small)
@@ -228,7 +209,7 @@ confint(heat_trans_lm_small)
 
 Confidence Intervals Interpretation for Heat Linear Model:
 
-Intercept: The 95% confidence interval for the intercept ranges from approximately -2.41 to -1.65. This suggests that, holding all other variables constant, the expected heating load varies between -2.41 and -1.65 KWh/$m^2$.
+Intercept: The 95% confidence interval for the intercept ranges from approximately -2.41 to -1.65. However, the intercept is not interpretable because it does not make sense for all of the variables in our model to be 0. For example, a building cannot realistically have a wall area of 1. (log(1) = 0) 
 Wall Area (log(WallA)): The 95% confidence interval for the coefficient of log(WallA) ranges from approximately 0.69 to 0.82. It implies that for each one-unit increase in wall area, the log heating load is expected to increase between 1.991087 and 2.274926 KWh/$m^2$, holding all other variables constant.
 Number of Stories (twoStories1): The 95% confidence interval for the coefficient of the number of stories (twoStories1) ranges from approximately 0.83 to 0.90. It suggests that, compared to one-story buildings, two-story buildings are expected to have a log heating load between 0.83 and 0.90 KWh/$m^2$ higher, holding all other variables constant.
 Glazing Area (GlazingA): The 95% confidence interval for the coefficient of GlazingA ranges from approximately 1.10 to 1.29. It implies that for each one $m^2$ increase in glazing area, the log heating load is expected to increase between 1.10 and 1.29 KWh/$m^2$, holding all other variables constant.
@@ -240,7 +221,7 @@ confint(cool_trans_lm_small)
 
 Confidence Intervals Interpretation for Cool Linear Model:
 
-Intercept: The 95% confidence interval for the intercept ranges from approximately -0.70 to 0.01. This suggests that, holding all other variables constant, the expected log cooling load varies between -0.70 and 0.01 KWh/$m^2$.
+Intercept: The 95% confidence interval for the intercept ranges from approximately -0.70 to 0.01. This intercept is also not interpretable for the same reasons as the first.
 Wall Area (log(WallA)): The 95% confidence interval for the coefficient of log(WallA) ranges from approximately 0.45 to 0.58. It implies that for each one-unit increase in the log of wall area, the log cooling load is expected to increase between 0.45 and 0.58 KWh/$m^2$, holding all other variables constant.
 Number of Stories (twoStories1): The 95% confidence interval for the coefficient of the number of stories (twoStories1) ranges from approximately 0.66 to 0.73. It suggests that, compared to one-story buildings, two-story buildings are expected to have a log cooling load between 0.66 and 0.73 KWh/$m^2$ higher, holding all other variables constant.
 Glazing Area (GlazingA): The 95% confidence interval for the coefficient of GlazingA ranges from approximately 0.60 to 0.77. It implies that for each one $m^2$ increase in glazing area, the log cooling load is expected to increase between 0.60 and 0.77 KWh/$m^2$, holding all other variables constant.
@@ -281,6 +262,7 @@ For each member of the group, write a short paragraph describing their contribut
 
 Zach Perry - My  contributions to this project consisted of doing most of the coding. Like cleaning the data and the early data exploration and visualization as well as checking all the model assumptions and potential interactions. I also did the 
 initial variable selection and collaborated with the rest of the team to determine the best model for analysis 
+
 Spencer Wilson - 
 
 Walter Vogelmann - For my portion of this assignment, once we had met together and decided not only on the data set and model including the variables, I worked on the formatting and organization of the report. I put together what was shown here in sections 1.3 and 2, including the regression method and assumption graphs and summaries, the tables and interpretations for the model summary commands, the anova evaluations, the confidence interval explanations, as well as the appendix. Overall, my role consisted of interpretation and reporting of data and diagnostics.
