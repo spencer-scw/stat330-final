@@ -133,7 +133,7 @@ shapiro.test(cool_trans_lm_small$residuals)
 ```
 
 
-Next, we need normality, which assumes that the residuals are normally distributed. For this, we performed many Wilk-Shapiro tests- we did this continually as we tried to fit an appropriate model. We eventually settled on a model that included transformations, interaction effects, and a pruned-down set of predictors. Despite this, we were only able to get p-values of $4.42e-13$ and $1.06e-9$ for the heating and cooling models, respectively.
+Next, we need normality, which assumes that the residuals are normally distributed. For this, we performed many Shapiro-Wilk tests- we did this continually as we tried to fit an appropriate model. We eventually settled on a model that included transformations, interaction effects, and a pruned-down set of predictors. Despite this, we were only able to get p-values of $4.42e-13$ and $1.06e-9$ for the heating and cooling models, respectively.
 
 This is a serious violation of the assumptions of linear regression, but we were unfortunately unable to improve the model with the methods we know to use. The analysis isn't completely ruined; it's just important to understand the implications of having non-normal data.
 
