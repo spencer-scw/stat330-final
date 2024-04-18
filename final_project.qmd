@@ -62,15 +62,15 @@ In our chosen study, researchers simulated the effects of several different fact
 
 The following graph illustrates this idea. It compares the energy usage for heating and cooling:
 
-```{r, fig.align='center'}
+```{r, fig.align='center', echo=FALSE}
 ggplot(data = energy) +
   geom_point(aes(x = Heat, y = Cool, color = twoStories)) +
   scale_color_discrete(labels = c("1 Story", "2 Stories")) +
   labs(
     title = "Energy usage of heating and cooling is correlated yet not equal",
     color = "Number of stories",
-    x = "Energy usage in cooling (KWh/m2)",
-    y = "Energy usage in heating (KWh/m2)"
+    x = "Energy usage in cooling (kWh/m2)",
+    y = "Energy usage in heating (kWh/m2)"
     )
   
 ```
@@ -91,11 +91,11 @@ This data was originally sampled from architectural simulation software (Ecotect
 | SurfaceArea |	514–808 |	$m^2$ |	The total area occupied by the floor plan of the building |
 | WallArea |	245–416 |	$m^2$ |	Total area of the exterior building wall including all openings |
 | RoofArea |	110–220 |	$m^2$ |	the surface area of the roof |
-| OverallHeight |	3.5–7 |	m |	Height from the lowest point of conditioned space to the highest point |
+| OverallHeight |	3.5–7 |	$m$ |	Height from the lowest point of conditioned space to the highest point |
 | GlazingArea |	0–0.4 |	$m^2$ |	The total area of the walls occupied by windows |
 | Output |
-| HeatingLoad  | 6–43 |	KWh/$m^2$ |	Amount of heat added per square meter to maintain comfortable temperature |
-| CoolingLoad |	10–48 |	KWh/$m^2$ |	The amount of heat removed per square meter to maintain comfortable temperature |
+| HeatingLoad  | 6–43 |	$\frac{kW \times h}{m^2}$ |	Amount of heat added per square meter to maintain comfortable temperature |
+| CoolingLoad |	10–48 |	$\frac{kW \times h}{m^2}$ |	The amount of heat removed per square meter to maintain comfortable temperature |
 
 ## 1.2 Questions of Interest
 
@@ -118,67 +118,79 @@ Our route to achieving a good model for the data was a long one. We needed to em
 First in our assumptions is a linear relationship. The core premise of multiple linear regression is the existence of a linear relationship between the response and the explanatory variables, which was displayed in the scatterplot above. 
 
 
-```{r, fig.align='center'}
+```{r, include=FALSE}
 # Heat Linear Model
 heat_trans_lm_small <- lm(log(Heat) ~ log(WallA) + twoStories + 
                       GlazingA + twoStories*GlazingA, data = energy)
 shapiro.test(heat_trans_lm_small$residuals)
 ```
 
-```{r, fig.align='center'}
+```{r, include=FALSE}
 # Cool Linear Model
 cool_trans_lm_small <- lm(log(Cool) ~ log(WallA) + twoStories + 
                       GlazingA + twoStories*GlazingA, data = energy) # best model so far
 shapiro.test(cool_trans_lm_small$residuals)
 ```
 
+
+Next, we need normality, which assumes that the residuals are normally distributed. For this, we performed many Wilk-Shapiro tests- we did this continually as we tried to fit an appropriate model. We eventually settled on a model that included transformations, interaction effects, and a pruned-down set of predictors. Despite this, we were only able to get p-values of $4.42e-13$ and $1.06e-9$ for the heating and cooling models, respectively.
+
+This is a serious violation of the assumptions of linear regression, but we were unfortunately unable to improve the model with the methods we know to use. The analysis isn't completely ruined; it's just important to understand the implications of having non-normal data.
+
+Here are some boxplots illustrating the non-normality of our residuals:
 Next, we need normality, which assumes that the residuals are normally distributed. Our intial models failed this assumption. In an attempt to fix that we attempted many variable transformations. Despite our best efforts, we could not get our residuals to be normal. We were able to minimize the break of this assumption as much as possible, but we finally concluded that this is just a weakness from the data. Here are our other plots for this assumption:
 
 Heat Model Boxplot:
-```{r, fig.align='center'}
+```{r, fig.align='center', echo=FALSE}
+
+par(mfrow=c(1,2))
+
 # Heat Model Boxplot
-boxplot(heat_trans_lm_small$residuals)
+boxplot(
+  heat_trans_lm_small$residuals,
+  col = "orange",
+  main = "Boxplot of heating residuals")
+boxplot(
+  cool_trans_lm_small$residuals,
+  col = "blue",
+  main = "Boxplot of cooling residuals")
 ```
 
-Cool Model Boxplot:
-```{r, fig.align='center'}
-# Cool Model Boxplot
-boxplot(cool_trans_lm_small$residuals)
+```{r, fig.align="center", echo=FALSE}
+par(mfrow=c(1,2))
+hist(
+  heat_trans_lm_small$residuals,
+  col = "orange",
+  main = "Histogam of heating residuals")
+hist(
+  cool_trans_lm_small$residuals,
+  col = "blue",
+  main = "Histogam of cooling residuals")
 ```
 
-Heat Model Histogram:
-```{r, fig.align='center'}
-# Heat Model Histogram
-hist(heat_trans_lm_small$residuals)
-```
 
-Cool Model Histogram:
-```{r, fig.align='center'}
-# Cool Model Histogram
-hist(cool_trans_lm_small$residuals)
-```
 
-Heat Model Diagnostic Plots:
-```{r, fig.align='center'}
-autoplot(heat_trans_lm_small)
-```
 
-Cool Model Diagnostic Plots:
-```{r, fig.align='center'}
-autoplot(cool_trans_lm_small)
-```
+As the plots show, there is a relatively normal-shaped distribution on the residuals. However, there are some problems with skewness and heavy tails. Going in order, the break to the normality is most visible in the boxplots for the two models- you can see that the heating data are tail-heavy with lots of outliers, while the cooling data are right skewed with many high outliers. These trends are also visible in the histograms.
 
-As the plots show, there is relatively normal distribution on the residuals, and this came after attempting many models to get the best fit for normality. Going in order, the break to the normality is most visible in the boxplots for the two models. We could not get rid of the outliers despite our best efforts. Moving on to the histograms, we see the normality curve take shape, especially with the cool model. Finally in the diagnostic plots, this was the best we could do to get the data as normally distributed as possible. This includes the least deviation on the Q-Q plot and randomized scatting of the residuals across the fitted values.
+The consequence for breaking this assumption will be a reduced power to make inferences based on our model. We'll see later than any prediction or confidence intervals will be unusually wide. However, these data aren't showing a strong trend away from normality other than the high variance; this seems to indicate that our model explains the overall trends in the data without being a perfect fit 100% of the time.
 
-```{r, fig.align='center'}
+```{r, fig.align='center', echo=FALSE}
 # Multicollinearity Plot
+par(mfrow=c(1,1))
 continuous <- energy %>%
   select(-twoStories, -RoofA, -SurfaceA)
-corrplot(cor(continuous), type = 'upper')
+corrplot(cor(continuous), type = 'upper', main = "Correlation plot of predictor values for the heating model")
 ```
 
-We also checked that there was no multicollinearity. This was shown in the above correlation plot. In a correlation matrices, the coefficients should ideally be below 0.80 which is the case aside from the correlation from heat and cool, which is a logical connection since they are opposites. 
+We also checked that there was no multicollinearity. This was shown in the above correlation plot. In a correlation matrices, the coefficients should ideally be below 0.80 which is the case aside from the correlation from heat and cool. As the values for heating and cooling are our response variables and not used to predict the other, this is not an issue for our model assumptions.
 
+```{r, fig.align='center', echo=FALSE}
+autoplot(heat_trans_lm_small, which=1, col="orange") +
+autoplot(cool_trans_lm_small, which=1, col="blue")
+```
+
+For the homoscedasticity assumption, the variance of error terms (residuals) should be consistent across all levels of the independent variables. The above scatterplots of residuals versus predicted values should not display any discernible pattern, such as a cone-shaped distribution, which is not visible in the plots shown with the normality assumption. 
 For the homoscedasticity assumption, the variance of residuals should be consistent across all levels of the independent variables. A scatterplot of residuals versus predicted values should not display any discernible pattern, such as a cone-shaped distribution, which is not visible in the plots shown with the normality assumption. 
 
 # 2 Analyses, Results, and Interpretation
@@ -187,21 +199,19 @@ For the homoscedasticity assumption, the variance of residuals should be consist
 Conduct the analysis in a logical fashion, including necessary code (and not any superfluous code) and its output.  Give simple interpretations of your findings related to the questions of interest.
 ```
 
-Below are the summaries for both the heat and cool models as well as interpretations for them.
-
-```{r, fig.align='center'}
+```{r, fig.align='center', include=FALSE}
 # Heat Linear Model
 summary(heat_trans_lm_small)
 ```
 
-The linear model for heating load suggests significant effects of architectural features on energy consumption. Our model has an adjusted R^2 of .9352, meaning that 93% of the variation in heating load can be explained by our model. The intercept, -2.03, represents the expected log heating load when all predictor variables are zero. The coefficient for log(WallA) indicates that for each one-unit increase in the log of wall area (in $m^2$), the log heating load increases by approximately 0.76 KWh/$m^2$ Similarly, the coefficient for the number of stories (twoStories1) suggests that two-story buildings have a log heating load approximately 0.86 KWh/$m^2$ higher than one-story buildings. Glazing area (GlazingA) also significantly affects the heating load, with each one $m^2$ increase leading to a log heating load increase of about 1.19 KWh/$m^2$. The interaction term between number of stories and glazing area (twoStories1:GlazingA) indicates that the effect of glazing area on heating load varies depending on the number of stories. The results of the global F-test show that at least one of our predictor variables has a relationship with heating load.
+Our linear model for heating load suggests significant effects of architectural features on energy consumption.  Our model has an adjusted R^2 of .9352, meaning that 93% of the variation in heating load can be explained by our model. The intercept is -2.03. It represents the expected log heating load when all predictor variables are zero. The coefficient for log(WallA) indicates that for each one-unit increase in the log of wall area (in $m^2$), the log heating load increases by approximately 0.76 KWh/$m^2$ Similarly, the coefficient for the number of stories (twoStories1) suggests that two-story buildings have a log heating load approximately 0.86 KWh/$m^2$ higher than one-story buildings. Glazing area (GlazingA) also significantly affects the heating load, with each one $m^2$ increase leading to a log heating load increase of about 1.19 KWh/$m^2$. The interaction term between number of stories and glazing area (twoStories1:GlazingA) indicates that the effect of glazing area on heating load varies depending on the number of stories. The results of the global F-test show that at least one of our predictor variables has a relationship with heating load.
 
-```{r, fig.align='center'}
+```{r, fig.align='center', include=FALSE}
 # Cool Linear Model
 summary(cool_trans_lm_small)
 ```
 
-The linear model for cooling load also highlights substantial influences of architectural features on energy consumption. This model has an R^2 of .917, which is slightly lower than the model for heating. The intercept, -0.34, represents the expected log cooling load when all predictor variables are zero. The coefficient for log(WallA) suggests that each one-unit increase in the log of wall area (in $m^2$) leads to a log cooling load increase of approximately 0.52 KWh/$m^2$. Similarly, the coefficient for the number of stories (twoStories1) indicates that two-story buildings have a log cooling load approximately 0.70 KWh/$m^2$ higher than one-story buildings. Glazing area (GlazingA) significantly affects the cooling load, with each one $m^2$ increase resulting in a log cooling load increase of about 0.68 KWh/$m^2$. However, the interaction term between number of stories and glazing area (twoStories1:GlazingA) is not statistically significant, suggesting no significant interaction effect on cooling load. The results of the global F-test show that at least one of our predictor variables has a relationship with cooling load.
+Our linear model for cooling load also highlights substantial influences of architectural features on energy consumption. This model has an R^2 of .917, which is slightly lower than the model for heating. The intercept, -0.34, represents the expected log cooling load when all predictor variables are zero. The coefficient for log(WallA) suggests that each one-unit increase in the log of wall area (in $m^2$) leads to a log cooling load increase of approximately 0.52 KWh/$m^2$. Similarly, the coefficient for the number of stories (twoStories1) indicates that two-story buildings have a log cooling load approximately 0.70 KWh/$m^2$ higher than one-story buildings. Glazing area (GlazingA) significantly affects the cooling load, with each one $m^2$ increase resulting in a log cooling load increase of about 0.68 KWh/$m^2$. However, the interaction term between number of stories and glazing area (twoStories1:GlazingA) is not statistically significant, suggesting no significant interaction effect on cooling load. The results of the global F-test show that at least one of our predictor variables has a relationship with cooling load.
 
 ```{r}
 confint(heat_trans_lm_small)
